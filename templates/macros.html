@@ -1,0 +1,13 @@
+{% macro field_errors(f) %}
+    {% for e in f.errors %}
+        {{ e }}
+    {% endfor %}
+{% endmacro %}
+
+{% macro create_field(f) %}
+    {{ f.label }}
+    {{ f() }}
+    {% for e in f.errors %}
+        {{ e }}
+    {% endfor %}
+{% endmacro %}

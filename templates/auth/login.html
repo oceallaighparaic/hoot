@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% from "macros.html" import create_field %}
+
+{% block header %}
+{% endblock %}
+
+{% block main_content %}
+    <main>
+        <form action="" method="POST" novalidate>
+            {{ form.hidden_tag() }}
+
+            {{ create_field(form.username) }}
+            <br />
+
+            {{ create_field(form.password) }}
+            <br />
+
+            {{ form.submit() }}
+        </form>
+    </main>
+{% endblock %}

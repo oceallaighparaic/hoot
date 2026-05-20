@@ -1,0 +1,35 @@
+// https://dbml.dbdiagram.io/docs
+
+Project app {
+    database_type: 'SQLite'
+    note: 'A remake of Honk, an IOS-exclusive messaging app ^_^'
+}
+
+Table users {
+    id integer [pk, increment]
+    username varchar [not null, unique]
+    password varchar [not null]
+    permission_id int [not null, default: 1]
+
+    // records (id, username, password, permission_id) {
+    //     1, "ADMIN", "admin", 2
+    // }
+}
+
+Table permissions {
+    id integer [pk, increment]
+    name varchar [not null, unique]
+
+    // records (id, name) {
+    //     1, "user"
+    //     2, "admin"
+    // }
+}
+ref: users.permission_id < permissions.id
+
+Table friends {
+    user1 integer
+    user2 integer
+}
+ref: friends.user1 <> users.id [delete: cascade]
+ref: friends.user2 <> users.id [delete: cascade]
