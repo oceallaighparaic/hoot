@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block header %}
+{% endblock %}
+
+{% block main_content %}
+    <main>
+        <h1>{{ query[0].id }}</h1>
+        {% for q in query[0][1:] %}
+        <p>{{ q }}</p>
+        {% endfor %}
+    </main>
+{% endblock %}

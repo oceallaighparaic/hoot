@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block header %}
+{% endblock %}
+
+{% block main_content %}
+    <main>
+        {% for r in query %}
+        <article>
+            {% for u in r %}
+                <a href="{{ url_for('P_user', username=u) }}">{{ u }}</a>
+            {% endfor %}
+        </article>
+        {% endfor %} 
+    </main>
+{% endblock %}

@@ -8,6 +8,8 @@ from flask import session, g
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
+from flask import request
+
 import forms
 import database.database as database
 
@@ -19,6 +21,7 @@ app = Flask(__name__)
 app.config["SECRET_KEY"] = "example"
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
+app.teardown_appcontext(database.close_db)
 #endregion
 
 @app.before_request
@@ -134,4 +137,31 @@ def logout() -> str:
         session["message"] = "Logged out."
 
     return redirect(url_for("P_home"))
+#endregion
+
+#region USERS
+@app.route("/search/", methods=["GET"], strict_slashes=False)
+@app.route("/search/<string:username>", methods=["GET"], strict_slashes=False)
+def P_search(username: str = "") -> str:
+    db = database.get_db()
+
+    query_text = "SELECT username FROM users"
+    query_args = []
+    if (username is not None):
+        query_text += " WHERE LOWER(username) LIKE ?"
+        query_args += [f"%{username}%"]
+    query = db.execute(query_text, query_args).fetchall()
+
+    g.return_args["query"] = query
+
+    return render_template("accounts/search.html", **g.return_args)
+
+@app.route("/user/<string:username>", methods=["GET"], strict_slashes=False)
+def P_user(username: str) -> str:
+    db = database.get_db()
+
+    query = db.execute("SELECT * FROM users WHERE LOWER(username) LIKE ? ;", (f"%{username}%",)).fetchall()
+    g.return_args["query"] = query
+
+    return render_template("accounts/user.html", **g.return_args)
 #endregion
