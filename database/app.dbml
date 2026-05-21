@@ -35,5 +35,5 @@ Table friends {
         (user1,user2) [unique]
     }
 }
-ref: friends.user1 > users.id [delete: cascade]3
+ref: friends.user1 > users.id [delete: cascade]
 ref: friends.user2 > users.id [delete: cascade]

@@ -5,20 +5,18 @@
 {% endblock %}
 
 {% block main_content %}
-    <main>
-        <form action="" method="POST" novalidate>
-            {{ form.hidden_tag() }}
+    <form action="" method="POST" novalidate>
+        {{ form.hidden_tag() }}
 
-            {{ create_field(form.username) }}
-            <br />
+        {{ create_field(form.username) }}
+        <br />
 
-            {{ create_field(form.password) }}
-            <br />
+        {{ create_field(form.password) }}
+        <br />
 
-            {{ create_field(form.password2) }}
-            <br />
+        {{ create_field(form.password2) }}
+        <br />
 
-            {{ form.submit() }}
-        </form>
-    </main>
+        {{ form.submit() }}
+    </form>
 {% endblock %}

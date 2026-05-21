@@ -7,8 +7,17 @@
     <title>hoot!!!</title>
 </head>
 <body>
-    {% block main_content %}
-    {% endblock %}
+    <header>
+        <form action="{{ url_for('html_search') }}" method="GET">
+            <input type="text" id="search" name="search" {% if search %} value="{{ search }}" {% else %} placeholder="Search Users" {% endif %} />
+            <input type="submit" value="Search" />
+        </form>
+    </header>
+
+    <main>
+        {% block main_content %}
+        {% endblock %}
+    </main>
 
     {% if message %}
         <h2>{{ message }}</h2>

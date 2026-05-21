@@ -2,44 +2,68 @@
 
 {% block header %}
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        document.querySelector("#addfriend").addEventListener('click', (e) => {
-            let data = new FormData();
-            data.append("add_friend_id", {{ query.id }});
-            data.append("user_id", {{ g.user_id }});
-            fetch(
-                "{{ url_for('add_friend') }}",
-                {
-                    method: "POST",
-                    body: data
-                }
-            )
-            .then(res => {
-                console.log(res.status);
-                return res.json();
-            })
-            .then(data => {
-                console.log(data);
-            })
-            .catch(err => {
-                console.log("Network error.");
-            });
-        }, false);
-    }, false);
+    function add_friend(e) {
+        let data = new FormData();
+        data.append("add_friend_id", {{ query.user_id }});
+        data.append("user_id", {{ g.user_id }});
+
+        let status;
+        fetch(
+            "{{ url_for('add_friend') }}",
+            {
+                method: "POST",
+                body: data
+            }
+        )
+        .then(res => {
+            status = res.status;
+        })
+        .then(data => {
+            if (status === 200) window.location.reload();
+        })
+        .catch(err => {
+            console.log("Network error.");
+        });
+    }
+
+    function remove_friend(e) {
+        let data = new FormData();
+        data.append("remove_friend_id", {{ query.user_id }});
+        data.append("user_id", {{ g.user_id }});
+
+        let status;
+        fetch(
+            "{{ url_for('remove_friend') }}",
+            {
+                method: "POST",
+                body: data
+            }
+        )
+        .then(res => {
+            status = res.status
+        })
+        .then(data => {
+            if (status === 204) window.location.reload();
+        })
+        .catch(err => {
+            console.log("Network error.");
+        });
+    }
 </script>
 {% endblock %}
 
 {% block main_content %}
-    <main>
-        {% if query %}
-            <h1>{{ query.id }}</h1>
-            {% for q in query[1:] %}
-            <p>{{ q }}</p>
-            {% endfor %}
+    {% if query %}
+        <h1>{{ query.user_id }}</h1>
+        <p>{{ query.username }}</p>
+        <p>{{ query.permission.title() }}</p>
 
-            {% if not query.id == g.user_id %}
-                <input type="button" value="Add Friend" id="addfriend" />
-            {% endif %}
+        {% if not query.id == g.user_id %}
+            <input 
+                type="button" 
+                value="{% if b_is_friend %}Remove{% else %}Add{% endif %} Friend" 
+                onclick="{% if b_is_friend %}remove_friend(){% else %}add_friend(){% endif %}"
+            />
         {% endif %}
-    </main>
+    {% endif %}
 {% endblock %}

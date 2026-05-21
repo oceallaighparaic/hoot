@@ -197,9 +197,10 @@ def logout() -> str:
 #endregion
 
 #region USERS
-@app.route("/search/", methods=["GET"], strict_slashes=False)
+@app.route("/search", methods=["GET"], strict_slashes=False)
 @app.route("/search/<string:username>", methods=["GET"], strict_slashes=False)
 def P_search(username: str = "") -> str:
+    g.return_args["search"] = username
     db = database.get_db()
 
     query_text = "SELECT username FROM users"
@@ -213,19 +214,54 @@ def P_search(username: str = "") -> str:
 
     return render_template("accounts/search.html", **g.return_args)
 
+# for html form
+@app.route("/html_search", methods=["GET"], strict_slashes=False)
+def html_search() -> str:
+    return redirect(url_for('P_search', username=request.args.get("search")))
+
 @app.route("/user/<string:username>", methods=["GET"], strict_slashes=False)
 @login_required
 def P_user(username: str) -> str:
     db = database.get_db()
 
-    query = db.execute("SELECT * FROM users WHERE LOWER(username) = ? ;", (username.lower(),)).fetchone()
+    query = db.execute("SELECT users.id AS user_id, users.username AS username, permissions.name AS permission FROM users JOIN permissions ON users.permission_id = permissions.id WHERE LOWER(username) = ? ;", (username.lower(),)).fetchone()
     g.return_args["query"] = query
 
     if not query:
         return redirect(url_for("P_home"))
 
-    friends = db.execute("SELECT user2 FROM friends WHERE user1 = ? OR user2 = ? ;", (g.user_id,g.user_id)).fetchall()
+    friends = list(db.execute(
+        """
+        WITH user_friends AS (
+        SELECT DISTINCT
+        u.id            AS user_id
+        ,u.username     AS username
+        ,f.friend       AS friend_id
+        FROM users AS u
+        JOIN
+            (
+            SELECT f1.user1 AS user, f1.user2 AS friend
+            FROM friends AS f1
+
+            UNION
+
+            SELECT f2.user2 AS user, f2.user1 AS friend
+            FROM friends AS f2
+            ) AS f
+        ON u.id = f.user
+        )
+        SELECT uf.friend_id AS friend_id, u.username AS friend_username
+        FROM user_friends AS uf
+        LEFT JOIN users AS u
+        ON uf.friend_id = u.id
+        WHERE LOWER(uf.username) = ?
+        ;
+        """,
+        (username.lower(),)
+    ).fetchall()) # (friend_id, friend_username)
     g.return_args["friends"] = friends
+
+    g.return_args["b_is_friend"] = max([0] + [int(g.user_id in f) for f in friends])
 
     return render_template("accounts/user.html", **g.return_args)
 
@@ -239,11 +275,31 @@ def add_friend():
     if not query:
         return json.dumps("User not found."),404 # user not found
     
-    query = db.execute("SELECT 1 FROM friends WHERE user1 = ? AND user2 = ? ;", (user_id,friend_id)).fetchone()
+    query_args = tuple(sorted([user_id,friend_id]))
+    query = db.execute("SELECT 1 FROM friends WHERE user1 = ? AND user2 = ? ;", query_args).fetchone()
     if query:
         return json.dumps("Already friends!"),409 # users already friends
     
     query = db.execute("INSERT INTO friends(user1, user2) VALUES (?,?) ;", tuple(sorted([user_id,friend_id])))
     db.commit()
     return json.dumps("Added as friend."),200 # success
+
+@app.route("/remove_friend", methods=["POST"], strict_slashes=False)
+def remove_friend():
+    friend_id: int = request.form["remove_friend_id"]
+    user_id: int = request.form["user_id"]
+    db = database.get_db()
+
+    query = db.execute("SELECT 1 FROM users WHERE id = ? ;", (friend_id,)).fetchone()
+    if not query:
+        return json.dumps("User not found."),404 # user not found
+
+    query_args = tuple(sorted([user_id,friend_id]))
+    query = db.execute("SELECT 1 FROM friends WHERE user1 = ? AND user2 = ? ;", query_args).fetchone()
+    if not query:
+        return json.dumps("Not friends."),404 # users are not friends
+    
+    query = db.execute("DELETE FROM friends WHERE user1 = ? AND user2 = ?", query_args)
+    db.commit()
+    return json.dumps("Removed as friend."),204 # success
 #endregion
