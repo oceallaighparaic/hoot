@@ -23,7 +23,7 @@ CREATE TABLE users(
     username VARCHAR NOT NULL UNIQUE,
     password VARCHAR NOT NULL,
     permission_id INTEGER NOT NULL DEFAULT 1,
-    FOREIGN KEY (permission_id) REFERENCES permissions(id)
+    FOREIGN KEY (permission_id) REFERENCES permissions(id) ON DELETE SET DEFAULT
 )
 ;
 -- SEED
@@ -38,7 +38,8 @@ VALUES (
 CREATE TABLE friends(
     user1 INTEGER NOT NULL,
     user2 INTEGER NOT NULL,
-    FOREIGN KEY (user1) REFERENCES users(id),
-    FOREIGN KEY (user2) REFERENCES users(id)
+    UNIQUE(user1,user2),
+    FOREIGN KEY (user1) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (user2) REFERENCES users(id) ON DELETE CASCADE
 )
 ;

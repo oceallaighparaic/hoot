@@ -5,6 +5,24 @@
 
 {% block main_content %}
     <main>
-        <p>Home.</p>
+        <h1>Home.</h1>
+
+        {% if g.user_id and g.username %}
+        <section>
+            <h1>Friends:</h1>
+            <ul>
+                {% for r in query %}
+                <li>
+                    <a href="{{ url_for('P_user', username=r.username) }}">
+                        <article>
+                            <h2>{{ r.username }}</h2>
+                            <p>{{ r.id }}</p>
+                        </article>
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </section>
+        {% endif %}
     </main>
 {% endblock %}

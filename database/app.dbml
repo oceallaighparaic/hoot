@@ -25,11 +25,15 @@ Table permissions {
     //     2, "admin"
     // }
 }
-ref: users.permission_id < permissions.id
+ref: users.permission_id > permissions.id [delete: set default]
 
 Table friends {
-    user1 integer
-    user2 integer
+    user1 integer [not null]
+    user2 integer [not null]
+
+    Indexes {
+        (user1,user2) [unique]
+    }
 }
-ref: friends.user1 <> users.id [delete: cascade]
-ref: friends.user2 <> users.id [delete: cascade]
+ref: friends.user1 > users.id [delete: cascade]3
+ref: friends.user2 > users.id [delete: cascade]

@@ -13,7 +13,9 @@ from flask import request
 import forms
 import database.database as database
 
+import functools
 import re
+import json
 #endregion
 
 #region CONFIG
@@ -33,17 +35,71 @@ def ret_args() -> None:
 
 @app.route("/", methods=["GET"], strict_slashes=False)
 def P_home() -> str:
+    if  g.user_id and g.username:
+        db = database.get_db()
+        query = db.execute("""
+            SELECT users.id AS id, users.username AS username
+            FROM friends JOIN users 
+            ON users.id = friends.user2
+            WHERE friends.user1 = ?
+                           
+            UNION
+                           
+            SELECT users.id AS id, users.username AS username
+            FROM friends JOIN users
+            ON users.id = friends.user1
+            WHERE friends.user2 = ?
+            ;
+            """, 
+            (g.user_id, g.user_id)
+        ).fetchall()
+        g.return_args["query"] = query
+
     return render_template("generic/home.html", **g.return_args)
 
+
 # !-- Authentication/login can be checked by accessing g.user_id or g.username
+# !-- Permission can be checked by accessing g.permission
 #region AUTHENTICATION
 @app.before_request
 def load_auth() -> None:
     g.user_id = session.get("user_id", None)
     g.username = None if not g.user_id else database.get_db().execute("SELECT username FROM users WHERE id = ? ;", (g.user_id,)).fetchone()["username"]
+    g.permission = None if not g.user_id else database.get_db().execute("SELECT permissions.name AS name FROM users JOIN permissions ON users.permission_id = permissions.id WHERE users.id = ? ;", (g.user_id,)).fetchone()["name"]
     if (not (bool(g.user_id)==bool(g.username))): print("Stale g.user_id/g.username")
 
+# !-- Decorators
+def login_required(v):
+    @functools.wraps(v)
+    def wrapped_v(*args, **kwargs):
+        if g.user_id is None:
+            # session["redirect"] = v.__name__
+            # print("Login required. Redirect to", session["redirect"])
+            return redirect(url_for("P_login"))
+        return v(*args, **kwargs)
+    return wrapped_v
+
+def logout_required(v):
+    @functools.wraps(v)
+    def wrapped_v(*args, **kwargs):
+        if g.user_id is not None:
+            return redirect(url_for("P_home"))
+        return v(*args, **kwargs)
+    return wrapped_v
+
+def admin_required(v):
+    @login_required
+    @functools.wraps(v)
+    def wrapped_v(*args, **kwargs):
+        if g.permission != "admin":
+            print("NOT ADMIN")
+            return redirect(url_for("P_home"))
+        return v(*args,**kwargs)
+    return wrapped_v
+
+# !-- Routes
 @app.route("/register", methods=["GET","POST"], strict_slashes=False)
+@logout_required
 def P_register() -> str:
     form = forms.RegisterForm()
     g.return_args["form"] = form
@@ -56,7 +112,7 @@ def P_register() -> str:
     username: str = form.username.data
     # !-- validate username
     username_errors: list[str] = []
-    if db.execute("SELECT * FROM users WHERE LOWER(username) LIKE ? ;", (f"%{username.lower()}%",)).fetchone():
+    if db.execute("SELECT * FROM users WHERE LOWER(username) = ? ;", (f"%{username.lower()}%",)).fetchone():
         username_errors += ["is already taken"]
     if not re.match(r'^[a-z0-9]+$', username, re.I):
         username_errors += ["must be alphanumeric"]
@@ -98,6 +154,7 @@ def P_register() -> str:
     #endregion
 
 @app.route("/login", methods=["GET","POST"], strict_slashes=False)
+@logout_required
 def P_login() -> str:
     form = forms.LoginForm()
     g.return_args["form"] = form
@@ -157,11 +214,36 @@ def P_search(username: str = "") -> str:
     return render_template("accounts/search.html", **g.return_args)
 
 @app.route("/user/<string:username>", methods=["GET"], strict_slashes=False)
+@login_required
 def P_user(username: str) -> str:
     db = database.get_db()
 
-    query = db.execute("SELECT * FROM users WHERE LOWER(username) LIKE ? ;", (f"%{username}%",)).fetchall()
+    query = db.execute("SELECT * FROM users WHERE LOWER(username) = ? ;", (username.lower(),)).fetchone()
     g.return_args["query"] = query
 
+    if not query:
+        return redirect(url_for("P_home"))
+
+    friends = db.execute("SELECT user2 FROM friends WHERE user1 = ? OR user2 = ? ;", (g.user_id,g.user_id)).fetchall()
+    g.return_args["friends"] = friends
+
     return render_template("accounts/user.html", **g.return_args)
+
+@app.route("/add_friend", methods=["POST"], strict_slashes=False)
+def add_friend():
+    friend_id: int = request.form["add_friend_id"]
+    user_id: int = request.form["user_id"]
+    db = database.get_db()
+
+    query = db.execute("SELECT 1 FROM users WHERE id = ? ;", (friend_id,)).fetchone()
+    if not query:
+        return json.dumps("User not found."),404 # user not found
+    
+    query = db.execute("SELECT 1 FROM friends WHERE user1 = ? AND user2 = ? ;", (user_id,friend_id)).fetchone()
+    if query:
+        return json.dumps("Already friends!"),409 # users already friends
+    
+    query = db.execute("INSERT INTO friends(user1, user2) VALUES (?,?) ;", tuple(sorted([user_id,friend_id])))
+    db.commit()
+    return json.dumps("Added as friend."),200 # success
 #endregion

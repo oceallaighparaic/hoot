@@ -1,13 +1,45 @@
 {% extends "base.html" %}
 
 {% block header %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelector("#addfriend").addEventListener('click', (e) => {
+            let data = new FormData();
+            data.append("add_friend_id", {{ query.id }});
+            data.append("user_id", {{ g.user_id }});
+            fetch(
+                "{{ url_for('add_friend') }}",
+                {
+                    method: "POST",
+                    body: data
+                }
+            )
+            .then(res => {
+                console.log(res.status);
+                return res.json();
+            })
+            .then(data => {
+                console.log(data);
+            })
+            .catch(err => {
+                console.log("Network error.");
+            });
+        }, false);
+    }, false);
+</script>
 {% endblock %}
 
 {% block main_content %}
     <main>
-        <h1>{{ query[0].id }}</h1>
-        {% for q in query[0][1:] %}
-        <p>{{ q }}</p>
-        {% endfor %}
+        {% if query %}
+            <h1>{{ query.id }}</h1>
+            {% for q in query[1:] %}
+            <p>{{ q }}</p>
+            {% endfor %}
+
+            {% if not query.id == g.user_id %}
+                <input type="button" value="Add Friend" id="addfriend" />
+            {% endif %}
+        {% endif %}
     </main>
 {% endblock %}
