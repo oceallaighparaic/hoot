@@ -7,6 +7,8 @@ DROP TABLE IF EXISTS friends
 ;
 DROP TABLE IF EXISTS permissions
 ;
+DROP TABLE IF EXISTS messages
+;
 
 CREATE TABLE permissions(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -41,5 +43,17 @@ CREATE TABLE friends(
     UNIQUE(user1,user2),
     FOREIGN KEY (user1) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (user2) REFERENCES users(id) ON DELETE CASCADE
+)
+;
+
+CREATE TABLE messages(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    sender_id INTEGER NOT NULL,
+    recipient_id INTEGER NOT NULL,
+    sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    message VARCHAR NOT NULL,
+    FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (recipient_id) REFERENCES users(id) ON DELETE CASCADE,
+    CHECK (sender_id <> recipient_id)
 )
 ;

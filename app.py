@@ -1,6 +1,5 @@
 #region IMPORTS
 from flask import Flask
-
 from flask import render_template, redirect, url_for
 
 from flask_session import Session
@@ -13,9 +12,13 @@ from flask import request
 import forms
 import database.database as database
 
+from flask_socketio import SocketIO
+from flask_socketio import emit, join_room, leave_room
+
 import functools
 import re
 import json
+from datetime import datetime
 #endregion
 
 #region CONFIG
@@ -24,6 +27,8 @@ app.config["SECRET_KEY"] = "example"
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 app.teardown_appcontext(database.close_db)
+Session(app)
+socketio = SocketIO(app)
 #endregion
 
 @app.before_request
@@ -35,7 +40,7 @@ def ret_args() -> None:
 
 @app.route("/", methods=["GET"], strict_slashes=False)
 def P_home() -> str:
-    if  g.user_id and g.username:
+    if g.user_id and g.username:
         db = database.get_db()
         query = db.execute("""
             SELECT users.id AS id, users.username AS username
@@ -56,7 +61,6 @@ def P_home() -> str:
         g.return_args["query"] = query
 
     return render_template("generic/home.html", **g.return_args)
-
 
 # !-- Authentication/login can be checked by accessing g.user_id or g.username
 # !-- Permission can be checked by accessing g.permission
@@ -213,7 +217,6 @@ def P_search(username: str = "") -> str:
     g.return_args["query"] = query
 
     return render_template("accounts/search.html", **g.return_args)
-
 # for html form
 @app.route("/html_search", methods=["GET"], strict_slashes=False)
 def html_search() -> str:
@@ -303,3 +306,50 @@ def remove_friend():
     db.commit()
     return json.dumps("Removed as friend."),204 # success
 #endregion
+
+#region CHAT
+@app.route("/chat/<int:friend_id>", methods=["GET"], strict_slashes=False)
+@login_required
+def P_chat(friend_id: int) -> str:
+    # retrieve old messages
+    db = database.get_db()
+
+    g.return_args["messages"] = [dict(foo) for foo in db.execute("SELECT id, sender_id, recipient_id, message, sent_at FROM messages WHERE (sender_id = ? AND recipient_id = ?) OR (sender_id = ? AND recipient_id = ?) ORDER BY sent_at ASC;", (g.user_id,friend_id,friend_id,g.user_id)).fetchall()]
+    g.return_args["friend_id"] = friend_id
+
+    return render_template("generic/chat.html", **g.return_args)
+
+@socketio.on("connect")
+def socket_connect():
+    print("User connected.")
+    emit("server_connection", {"data":f"Welcome."})
+
+@socketio.on("disconnect")
+def socket_disconnect():
+    print("User disconnected.")
+    pass
+
+# !-- Room id is generated using the algorithm: sort ids low to high, join by '_'
+def generate_room_id(ids: list):
+    return "_".join([str(v) for v in sorted(ids)])
+
+@socketio.on("open_chat")
+def socket_open_chat(data):
+    join_room(generate_room_id(data["ids"]))
+    print(f"{generate_room_id(data["ids"])} opened chat.")
+    emit("server_connection", {"data":f"User joined {data["room"]}"}, to=data["room"])
+
+@socketio.on("send_message")
+def socket_send_message(data):
+    print(data)
+
+    emit_obj = {
+        "message":data["message"], 
+        "sender_id":data["sender_id"],
+    }
+    emit("server_response", emit_obj, to=generate_room_id(data["ids"]))
+#endregion
+
+# !-- Run with python -m app instead of 'flask run'
+if __name__ == "__main__":
+    socketio.run(app, debug=True)

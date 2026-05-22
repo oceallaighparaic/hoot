@@ -3,3 +3,4 @@ app.db
 __pycache__
 flask_session
 queries.sql
+.vscode

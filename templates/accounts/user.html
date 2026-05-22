@@ -2,54 +2,10 @@
 
 {% block header %}
 <script>
-    function add_friend(e) {
-        let data = new FormData();
-        data.append("add_friend_id", {{ query.user_id }});
-        data.append("user_id", {{ g.user_id }});
-
-        let status;
-        fetch(
-            "{{ url_for('add_friend') }}",
-            {
-                method: "POST",
-                body: data
-            }
-        )
-        .then(res => {
-            status = res.status;
-        })
-        .then(data => {
-            if (status === 200) window.location.reload();
-        })
-        .catch(err => {
-            console.log("Network error.");
-        });
-    }
-
-    function remove_friend(e) {
-        let data = new FormData();
-        data.append("remove_friend_id", {{ query.user_id }});
-        data.append("user_id", {{ g.user_id }});
-
-        let status;
-        fetch(
-            "{{ url_for('remove_friend') }}",
-            {
-                method: "POST",
-                body: data
-            }
-        )
-        .then(res => {
-            status = res.status
-        })
-        .then(data => {
-            if (status === 204) window.location.reload();
-        })
-        .catch(err => {
-            console.log("Network error.");
-        });
-    }
+    const add_friend_url = "{{ url_for('add_friend') }}"
+    const remove_friend_url = "{{ url_for('remove_friend') }}"
 </script>
+<script src="{{ url_for('static', filename='scripts/user.js') }}"></script>
 {% endblock %}
 
 {% block main_content %}
@@ -58,12 +14,24 @@
         <p>{{ query.username }}</p>
         <p>{{ query.permission.title() }}</p>
 
-        {% if not query.id == g.user_id %}
-            <input 
-                type="button" 
-                value="{% if b_is_friend %}Remove{% else %}Add{% endif %} Friend" 
-                onclick="{% if b_is_friend %}remove_friend(){% else %}add_friend(){% endif %}"
-            />
+        {% if not query.user_id == g.user_id %}
+        <ul>
+            <li>
+                <input 
+                    type="button" 
+                    value="{% if b_is_friend %}Remove{% else %}Add{% endif %} Friend" 
+                    onclick="{% if b_is_friend %}remove_friend(this){% else %}add_friend(this){% endif %}"
+                    data-user-id="{{ g.user_id }}"
+                    data-friend-id="{{ query.user_id }}"
+                />
+            </li>
+            
+            {% if b_is_friend %}
+            <li>
+                <a href="{{ url_for('P_chat', friend_id=query.user_id) }}">Open Chat</a>
+            </li>
+            {% endif %}
+        </ul>
         {% endif %}
     {% endif %}
 {% endblock %}

@@ -37,3 +37,15 @@ Table friends {
 }
 ref: friends.user1 > users.id [delete: cascade]
 ref: friends.user2 > users.id [delete: cascade]
+
+Table messages {
+    id integer [pk, increment]
+    sender_id integer [not null]
+    recipient_id integer [not null]
+    sent_at datetime [not null, note:"YYYY-MM-DD HH:mm:SS"]
+    message varchar [not null]
+
+    note: "CHECK (sender_id <> recipient_id)"
+}
+ref: messages.sender_id > users.id [delete: cascade]
+ref: messages.recipient_id > users.id [delete: cascade]
