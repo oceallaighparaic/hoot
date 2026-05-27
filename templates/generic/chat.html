@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block header %}
-<script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script> <!-- socketio client-side -->
+<script src="{{ url_for('static', filename='scripts/socket.io.min.js') }}"></script> <!-- socketio client-side -->
 <script>
     const userId = {{ g.user_id }};
 
@@ -14,15 +14,13 @@
 
 {% block main_content %}
     <section id="chat">
-        <!-- {# {% for msg in messages %}
-            <article class="{% if msg.sender_id == g.user_id %}sent_message{% else %}received_message{% endif %}" id="message_{{ msg.id }}">
-                <aside>{{ msg.sent_at }}</aside>
-                <p>message_{{ msg.id }}</p>
-                <p>{{ msg.message }}</p>
-            </article>
-        {% endfor %} #} -->
+        <article id="receiver_box">
+            <p></p>
+        </article>
+        <article id="sender_box">
+            <p></p>
+        </article>
     </section>
 
     <input type="text" placeholder="Enter a message..." id="chat-input" />
-    <input type="button" value="Send" onclick="send_message()" />
 {% endblock %}

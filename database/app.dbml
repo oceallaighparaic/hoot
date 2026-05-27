@@ -41,11 +41,11 @@ ref: friends.user2 > users.id [delete: cascade]
 Table messages {
     id integer [pk, increment]
     sender_id integer [not null]
-    recipient_id integer [not null]
-    sent_at datetime [not null, note:"YYYY-MM-DD HH:mm:SS"]
+    room varchar [not null]
+    sent_at datetime [not null, default: "CURRENT_TIMESTAMP", note:"YYYY-MM-DD HH:mm:SS"]
     message varchar [not null]
 
-    note: "CHECK (sender_id <> recipient_id)"
+    note: "UNIQUE (sender_id,room)"
 }
 ref: messages.sender_id > users.id [delete: cascade]
 ref: messages.recipient_id > users.id [delete: cascade]

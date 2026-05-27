@@ -49,11 +49,11 @@ CREATE TABLE friends(
 CREATE TABLE messages(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     sender_id INTEGER NOT NULL,
-    recipient_id INTEGER NOT NULL,
+    room VARCHAR NOT NULL,
     sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     message VARCHAR NOT NULL,
     FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (recipient_id) REFERENCES users(id) ON DELETE CASCADE,
-    CHECK (sender_id <> recipient_id)
+    CHECK (sender_id <> room),
+    UNIQUE (sender_id,room)
 )
 ;

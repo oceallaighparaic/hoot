@@ -314,7 +314,7 @@ def P_chat(friend_id: int) -> str:
     # retrieve old messages
     db = database.get_db()
 
-    g.return_args["messages"] = [dict(foo) for foo in db.execute("SELECT id, sender_id, recipient_id, message, sent_at FROM messages WHERE (sender_id = ? AND recipient_id = ?) OR (sender_id = ? AND recipient_id = ?) ORDER BY sent_at ASC;", (g.user_id,friend_id,friend_id,g.user_id)).fetchall()]
+    g.return_args["messages"] = [dict(foo) for foo in db.execute( "SELECT sender_id, room, message FROM messages WHERE room = ?;" , (generate_room_id([g.user_id,friend_id]),) ).fetchall()]
     g.return_args["friend_id"] = friend_id
 
     return render_template("generic/chat.html", **g.return_args)
@@ -335,12 +335,13 @@ def generate_room_id(ids: list):
 
 @socketio.on("open_chat")
 def socket_open_chat(data):
-    join_room(generate_room_id(data["ids"]))
-    print(f"{generate_room_id(data["ids"])} opened chat.")
-    emit("server_connection", {"data":f"User joined {data["room"]}"}, to=data["room"])
+    room_id = generate_room_id(data["ids"])
+    join_room(room_id)
+    print(f"{room_id} opened chat.")
+    emit("server_connection", {"data":f"User joined {room_id}"}, to=room_id)
 
-@socketio.on("send_message")
-def socket_send_message(data):
+@socketio.on("send_key")
+def socket_send_key(data):
     print(data)
 
     emit_obj = {
@@ -348,6 +349,18 @@ def socket_send_message(data):
         "sender_id":data["sender_id"],
     }
     emit("server_response", emit_obj, to=generate_room_id(data["ids"]))
+
+@socketio.on("save_message")
+def socket_save_message(data):
+    print(data)
+
+    db = database.get_db()
+    room_id = generate_room_id(data["ids"])
+    if db.execute("SELECT 1 FROM messages WHERE sender_id = ? AND room = ? ;", (data["sender_id"], room_id)).fetchone():
+        db.execute("UPDATE messages SET message = ? WHERE sender_id = ? AND room = ? ;", (data["message"], data["sender_id"], room_id))
+    else: 
+        db.execute("INSERT INTO messages(sender_id, room, message) VALUES (?,?,?)", (data["sender_id"], room_id, data["message"]))
+    db.commit()
 #endregion
 
 # !-- Run with python -m app instead of 'flask run'
