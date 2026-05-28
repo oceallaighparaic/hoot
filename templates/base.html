@@ -3,25 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/generic.css') }}" />
     {% block header %}{% endblock %}
+
     <title>hoot!!!</title>
 </head>
 <body>
     <nav>
         <ul>
-            <li><a href="{{ url_for('P_home') }}">Home</a></li>
+            <li><a href="{{ url_for('P_home') }}">
+                <img src="{{ url_for('static', filename='images/hoot_temp.png') }}" alt="hoot logo" />
+            </a></li>
             <li>            
-                <form action="{{ url_for('html_search') }}" method="GET">
-                    <input type="text" id="search" name="search" {% if search %} value="{{ search }}" {% else %} placeholder="Search Users" {% endif %} />
-                    <input type="submit" value="Search" />
+                <form action="{{ url_for('html_search') }}" method="GET" class="nav-search">
+                    <input type="text" id="search" name="search" value="{{ search }}" placeholder="search a username..." />
+                    <input type="image" src="{{ url_for('static', filename='images/search_light.svg') }}" alt="Search for a username." />
                 </form>
             </li>
             {% if g.user_id and g.username %}
-            <li><a href="{{ url_for('P_user', username=g.username )}}">{{ g.username }}</a></li>
-            <li><a href="{{ url_for('logout') }}">Log Out</a></li>
+            <li><a href="{{ url_for('P_user', username=g.username )}}" class="nav-cta">{{ g.username }}</a></li>
+            <li><a href="{{ url_for('logout') }}" class="nav-btn">log out</a></li>
             {% else %}
-            <li><a href="{{ url_for('P_register') }}">Register</a></li>
-            <li><a href="{{ url_for('P_login') }}">Log In</a></li>
+            <li><a href="{{ url_for('P_login') }}" class="nav-btn">log in</a></li>
+            <li><a href="{{ url_for('P_register') }}" class="nav-cta">sign up</a></li>
             {% endif %}
         </ul>
     </nav>

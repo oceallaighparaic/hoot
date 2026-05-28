@@ -1,0 +1,95 @@
+@use 'sass:color'
+@use 'base'
+    
+nav
+    background-color: base.$secondary
+
+    ul
+        display: flex
+        flex-flow: row nowrap
+        align-items: center
+        justify-content: flex-start
+        gap: 0.5em
+
+        margin: 0
+        padding: 14px 1.5vw
+
+        li
+            list-style-type: none
+
+            img
+                height: 35px
+                width: auto
+
+            &:has(.nav-search)
+                margin: 0 auto
+
+.nav-search
+    display: flex
+    flex-flow: row nowrap
+    align-items: flex-start
+    justify-content: center
+
+    input
+        $_text_height: 22px
+        $_input_padding_y: 5px 
+        $_input_padding_x: 7px
+
+        border: none
+        padding: $_input_padding_y $_input_padding_x
+
+        &[type='text']
+            font-weight: 800
+            
+            width: 18vw
+            height: $_text_height
+
+            ::placeholder
+                color: color.change(base.$primary-darkest, $alpha: 0.5)
+
+        &[type='image']
+            $_image_size: 20px
+            width: $_image_size
+            height: auto
+
+            $_height_diff: $_text_height - $_image_size
+            padding: $_input_padding_y+($_height_diff/2) $_input_padding_x+($_height_diff/2)
+            border-radius: 0 5px 5px 0
+
+            background-color: base.$primary-light
+
+%nav-btn-base
+    font-size: 1.2em
+    font-weight: 500
+    padding: 5px 1.5vw
+    text-decoration: none
+.nav-btn
+    @extend %nav-btn-base
+    padding: 5px 1vw 
+    color: base.$primary-light
+
+    position: relative
+    &::before
+        content: ""
+        position: absolute
+        left: 10%
+        bottom: 0
+
+        width: 0
+        height: 2px
+        background-color: base.$primary-light
+
+        transition: width ease 0.2s
+
+    transition: color ease 0.2s
+    &:hover
+        color: base.$accent-one
+
+        &::before
+            background-color: base.$accent-one
+            width: 80%
+.nav-cta
+    @extend %nav-btn-base
+    color: base.$accent-one
+    border: base.$accent-one solid 2.5px
+    border-radius: 10px
