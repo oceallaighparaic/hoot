@@ -60,7 +60,9 @@ def P_home() -> str:
         ).fetchall()
         g.return_args["query"] = query
 
-    return render_template("generic/home.html", **g.return_args)
+        return render_template("generic/home.html", **g.return_args)
+    
+    return render_template("generic/landing.html", **g.return_args)
 
 # !-- Authentication/login can be checked by accessing g.user_id or g.username
 # !-- Permission can be checked by accessing g.permission

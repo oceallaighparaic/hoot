@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block header %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}" />
+{% endblock %}
+
+{% block main_content %}
+<section>
+    <figure>
+        <img src="{{ url_for('static', filename='images/landing_corrected.png') }}" alt="An anxious woman reading her texts and figuring out how to respond." />
+    </figure>
+    <article>
+        <h1>What sucks about modern texting?</h1>
+        <p>
+            Have you ever spent so long trying to write the perfect message that the <span class="highlight-one">organic emotion</span> washed away? <br />
+            Modern texting is filtered: <span class="highlight-two">over-thought</span>, <span class="highlight-two">over-edited</span>, and <span class="highlight-two">over-sterile</span>.
+        </p>
+
+        <p class="moto">Strip away the filter.</p>
+        <p>No drafts and no delays, just typing in real-time.</p>
+
+        <a href="{{ url_for('P_register') }}">Let's Do It!</a>
+    </article>
+</section>
+{% endblock %}

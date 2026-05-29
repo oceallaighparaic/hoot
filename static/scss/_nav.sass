@@ -1,8 +1,38 @@
 @use 'sass:color'
 @use 'base'
+@use 'nav_color' as nav
     
 nav
-    background-color: base.$secondary
+    $n_dots_x: 80
+    $n_dots_y: 4
+
+    position: relative
+    &::before // background color
+        content: ""
+        position: absolute
+        width: 100%
+        height: 100%
+        top: 0
+        left: 0
+        z-index: -2
+        background-color: nav.$background-color
+    &::after // dots
+        content: ""
+        position: absolute
+
+        $dot_gap_x: calc(100% / $n_dots_x) // width / N dots
+        $dot_gap_y: calc(100% / $n_dots_y) // height / N dots
+        width: 100%
+        height: 100%
+
+        left: 0
+        top: 0
+        z-index: -1
+
+        background-image: radial-gradient(circle at 1px 1px, color.change(nav.$dot_color, $alpha: 0.2) 1px, transparent 0)
+        background-size: $dot_gap_x $dot_gap_y
+        background-position: $dot_gap_x*0.5 $dot_gap_y*0.5
+        mask-image: linear-gradient(to left, black 50%, transparent 105%)
 
     ul
         display: flex
@@ -20,6 +50,10 @@ nav
             img
                 height: 35px
                 width: auto
+
+                transition: transform ease 0.2s
+                &:hover
+                    transform: scale(1.05) rotate(-1.5deg)
 
             &:has(.nav-search)
                 margin: 0 auto
@@ -44,6 +78,8 @@ nav
             width: 18vw
             height: $_text_height
 
+            border-radius: 5px 0 0 5px
+
             ::placeholder
                 color: color.change(base.$primary-darkest, $alpha: 0.5)
 
@@ -54,11 +90,19 @@ nav
 
             $_height_diff: $_text_height - $_image_size
             padding: $_input_padding_y+($_height_diff/2) $_input_padding_x+($_height_diff/2)
-            border-radius: 0 5px 5px 0
+            border-radius: 5px
+            transform: translateX(-5px)
 
             background-color: base.$primary-light
 
+            transition: background-color ease 0.2s, transform ease 0.2s
+            &:hover
+                background-color: base.$primary-mid
+                transform: translateX(-5px) scale(1.05)
+                box-shadow: 0 0 12px 2px color.change(base.$primary-mid, $alpha: 0.4)
+
 %nav-btn-base
+    display: block
     font-size: 1.2em
     font-weight: 500
     padding: 5px 1.5vw
@@ -66,10 +110,10 @@ nav
 .nav-btn
     @extend %nav-btn-base
     padding: 5px 1vw 
-    color: base.$primary-light
+    color: nav.$btn-color
 
     position: relative
-    &::before
+    &::before // underline
         content: ""
         position: absolute
         left: 10%
@@ -77,19 +121,27 @@ nav
 
         width: 0
         height: 2px
-        background-color: base.$primary-light
+        background-color: nav.$btn-color
 
         transition: width ease 0.2s
 
     transition: color ease 0.2s
     &:hover
-        color: base.$accent-one
+        color: nav.$btn-hover-color
 
         &::before
-            background-color: base.$accent-one
+            background-color: nav.$btn-hover-color
             width: 80%
 .nav-cta
     @extend %nav-btn-base
     color: base.$accent-one
     border: base.$accent-one solid 2.5px
+    background-color: transparent
     border-radius: 10px
+
+    transition: color ease 0.2s, border-color ease 0.2s, box-shadow ease 0.5s, transform ease 0.2s
+    &:hover
+        color: color.adjust(base.$accent-one, $lightness: -15%)
+        border-color: color.adjust(base.$accent-one, $lightness: -15%)
+        box-shadow: 0 0 12px 2px color.change(base.$accent-one, $alpha: 0.4)
+        transform: scale(1.02)

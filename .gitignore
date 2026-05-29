@@ -5,3 +5,4 @@ flask_session
 queries.sql
 .vscode
 css
+.DS_Store
