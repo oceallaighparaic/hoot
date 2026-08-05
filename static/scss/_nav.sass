@@ -3,10 +3,11 @@
 @use 'nav_color' as nav
     
 nav
+    position: relative
+
     $n_dots_x: 80
     $n_dots_y: 4
-
-    position: relative
+    $dot_size: 1px
     &::before // background color
         content: ""
         position: absolute
@@ -29,7 +30,7 @@ nav
         top: 0
         z-index: -1
 
-        background-image: radial-gradient(circle at 1px 1px, color.change(nav.$dot_color, $alpha: 0.2) 1px, transparent 0)
+        background-image: radial-gradient(circle at $dot_size $dot_size, color.change(nav.$dot_color, $alpha: 0.2) $dot_size, transparent 0)
         background-size: $dot_gap_x $dot_gap_y
         background-position: $dot_gap_x*0.5 $dot_gap_y*0.5
         mask-image: linear-gradient(to left, black 50%, transparent 105%)

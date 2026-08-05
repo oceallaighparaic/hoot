@@ -17,7 +17,7 @@
             <li>            
                 <form action="{{ url_for('html_search') }}" method="GET" class="nav-search">
                     <input type="text" id="search" name="search" value="{{ search }}" placeholder="search a username..." />
-                    <input type="image" src="{{ url_for('static', filename='images/search_light.svg') }}" alt="Search for a username." />
+                    <input type="image" src="{% block search_image %}{{ url_for('static', filename='images/search_light.svg') }}{% endblock %}" alt="Search for a username." />
                 </form>
             </li>
             {% if g.user_id and g.username %}

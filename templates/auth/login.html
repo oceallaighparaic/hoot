@@ -2,18 +2,31 @@
 {% from "macros.html" import create_field %}
 
 {% block header %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}" />
+{% endblock %}
+
+{% block search_image %}
+    {{ url_for('static', filename='images/search_dark.svg') }}
 {% endblock %}
 
 {% block main_content %}
+<article id="login">
+    <h1>Log In</h1>
     <form action="" method="POST" novalidate>
         {{ form.hidden_tag() }}
 
-        {{ create_field(form.username) }}
+        {{ create_field(form.username, False, "username...") }}
         <br />
 
-        {{ create_field(form.password) }}
+        {{ create_field(form.password, False, "password...") }}
         <br />
 
-        {{ form.submit() }}
+        {{ form.submit(value="log in") }}
     </form>
+</article>
+<article id="signup" class="redirect">
+    <h1>New to hoot?</h1>
+    <p>Sign up to skip the filters.</p>
+    <a href="{{ url_for('P_register') }}">sign up</a>
+</article>
 {% endblock %}

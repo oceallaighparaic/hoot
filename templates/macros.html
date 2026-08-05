@@ -4,9 +4,11 @@
     {% endfor %}
 {% endmacro %}
 
-{% macro create_field(f) %}
-    {{ f.label }}
-    {{ f() }}
+{% macro create_field(f, label=True, placeholder="") %}
+    {% if label %}
+        {{ f.label }}
+    {% endif %}
+    {{ f(placeholder=placeholder) }}
     {% for e in f.errors %}
         {{ e }}
     {% endfor %}

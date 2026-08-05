@@ -15,3 +15,11 @@ html, body
     font-family: 'Rubik', 'Calibri', Helvetica, sans-serif
     background-color: $primary-light
     color: $primary-dark
+
+@media(prefers-reduced-motion: no-preference)
+    @view-transition
+        navigation: auto
+
+    ::view-transition-group(page-content)
+        animation-duration: 1s
+        animation-timing-function: ease
