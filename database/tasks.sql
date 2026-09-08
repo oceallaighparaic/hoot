@@ -23,6 +23,7 @@ VALUES ('user'),('admin')
 CREATE TABLE users(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username VARCHAR NOT NULL UNIQUE,
+    pfp VARCHAR NOT NULL DEFAULT '1.jpg',
     password VARCHAR NOT NULL,
     permission_id INTEGER NOT NULL DEFAULT 1,
     FOREIGN KEY (permission_id) REFERENCES permissions(id) ON DELETE SET DEFAULT
