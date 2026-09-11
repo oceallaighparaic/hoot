@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "macros.html" import create_field %}
 
 {% block header %}
 <script>
@@ -6,11 +7,12 @@
     const remove_friend_url = "{{ url_for('remove_friend') }}"
 </script>
 <script src="{{ url_for('static', filename='scripts/user.js') }}"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/user.css') }}" />
 {% endblock %}
 
 {% block main_content %}
     {% if query %}
-        <h1>{{ query.user_id }}</h1>
+        <img src="{{ url_for('static', filename='images/pfp') }}/{{ query.pfp }}" alt="Profile picture" />
         <p>{{ query.username }}</p>
         <p>{{ query.permission.title() }}</p>
 
@@ -32,6 +34,13 @@
             </li>
             {% endif %}
         </ul>
+        {% elif pfp_form %}
+            <form action="" method="POST" enctype="multipart/form-data" novalidate>
+                {{ pfp_form.hidden_tag() }}
+
+                {{ create_field(pfp_form.image) }}
+                {{ pfp_form.submit() }}
+            </form>
         {% endif %}
     {% endif %}
 {% endblock %}

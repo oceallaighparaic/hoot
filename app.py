@@ -15,6 +15,11 @@ import database.database as database
 from flask_socketio import SocketIO
 from flask_socketio import emit, join_room, leave_room
 
+# https://flask-wtf.readthedocs.io/en/1.2.x/form/?highlight=filefield
+import os
+from werkzeug.utils import secure_filename
+import uuid
+
 import functools
 import re
 import json
@@ -26,6 +31,7 @@ app = Flask(__name__)
 app.config["SECRET_KEY"] = "example"
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
+app.config["UPLOAD_FOLDER"] = "static/images/pfp/"
 app.teardown_appcontext(database.close_db)
 Session(app)
 socketio = SocketIO(app)
@@ -224,12 +230,27 @@ def P_search(username: str = "") -> str:
 def html_search() -> str:
     return redirect(url_for('P_search', username=request.args.get("search")))
 
-@app.route("/user/<string:username>", methods=["GET"], strict_slashes=False)
+@app.route("/user/<string:username>", methods=["GET","POST"], strict_slashes=False)
 @login_required
 def P_user(username: str) -> str:
+    pfp_form = forms.EditUserForm()
     db = database.get_db()
 
-    query = db.execute("SELECT users.id AS user_id, users.username AS username, permissions.name AS permission FROM users JOIN permissions ON users.permission_id = permissions.id WHERE LOWER(username) = ? ;", (username.lower(),)).fetchone()
+    query = db.execute(
+        """
+        SELECT 
+        users.id            AS user_id
+        ,users.username     AS username
+        ,users.pfp          AS pfp
+        ,permissions.name   AS permission 
+        FROM users 
+        JOIN permissions 
+        ON users.permission_id = permissions.id 
+        WHERE LOWER(username) = ? 
+        ;
+        """, 
+        (username.lower(),)
+    ).fetchone()
     g.return_args["query"] = query
 
     if not query:
@@ -263,10 +284,30 @@ def P_user(username: str) -> str:
         ;
         """,
         (username.lower(),)
-    ).fetchall()) # (friend_id, friend_username)
+    ).fetchall()) # (friend_id, friend_username, )
     g.return_args["friends"] = friends
 
     g.return_args["b_is_friend"] = max([0] + [int(g.user_id in f) for f in friends])
+
+    g.return_args["pfp_form"] = pfp_form
+    if pfp_form.validate_on_submit():
+        # https://flask-wtf.readthedocs.io/en/1.2.x/form/?highlight=filefield
+        image = pfp_form.image.data
+
+        filename: str = secure_filename(f"{uuid.uuid4()}.{image.filename.split('.')[-1]}")
+        image.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+
+        cur = db.cursor()
+        cur.execute(
+            """
+            UPDATE users
+            SET pfp = ?
+            WHERE id = ?
+            ;
+            """
+            ,(filename, g.user_id)
+        )
+        db.commit()
 
     return render_template("accounts/user.html", **g.return_args)
 

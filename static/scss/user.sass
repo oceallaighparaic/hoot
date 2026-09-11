@@ -1,0 +1,9 @@
+@use 'base'
+@use 'sass:math'
+
+img:not(nav img)
+    $pfp-rad: 20vw
+    width: $pfp-rad
+    height: $pfp-rad
+
+    border-radius: math.div($pfp-rad, 2)

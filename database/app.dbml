@@ -8,11 +8,12 @@ Project app {
 Table users {
     id integer [pk, increment]
     username varchar [not null, unique]
+    pfp varchar [not null, default: '1.jpg']
     password varchar [not null]
     permission_id int [not null, default: 1]
 
     // records (id, username, password, permission_id) {
-    //     1, "ADMIN", "admin", 2
+    //     1, "ADMIN", "1.jpg", "admin", 2
     // }
 }
 
@@ -48,4 +49,3 @@ Table messages {
     note: "UNIQUE (sender_id,room)"
 }
 ref: messages.sender_id > users.id [delete: cascade]
-ref: messages.recipient_id > users.id [delete: cascade]
