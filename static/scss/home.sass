@@ -27,6 +27,11 @@
         list-style: none
 
         figure
+            display: flex
+            flex-flow: column nowrap
+            justify-content: center
+            align-items: center
+
             *
                 padding: 0
                 margin: 0
@@ -34,10 +39,16 @@
             img
                 $pfp-rad: 10vw
                 width: $pfp-rad
-                height: $pfp-rad
+                aspect-ratio: 1
 
-                border-radius: math.div($pfp-rad, 2)
+                padding: 0
+                margin: 0
+
                 background-color: base.$primary-light
+
+                mask: url('/static/images/pfp/circle.svg') center / contain no-repeat
+                --webkit-mask: url('/static/images/pfp/circle.svg') center / contain no-repeat
+                object-fit: cover
 
             figcaption
                 text-align: center
@@ -48,7 +59,7 @@
 
         @include dot_pattern.dot_background(
             $n-dots-x: 15, $n-dots-y: 15, $dot-size: 1px, 
-            $dot-color: base.$primary-darkest, 
+            $dot-color: base.$secondary, 
             $background-color: base.$primary-mid, $border-radius: 15px,
             $direction: to bottom
         )

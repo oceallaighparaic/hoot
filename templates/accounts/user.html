@@ -12,7 +12,7 @@
 
 {% block main_content %}
     {% if query %}
-        {% set b_user_edit_profile = query.user_id == g.user_id %}v
+        {% set b_user_edit_profile = query.user_id == g.user_id %}
 
         {% if b_user_edit_profile and pfp_form %}
             <form action="" method="POST" enctype="multipart/form-data" novalidate>
@@ -22,7 +22,7 @@
                 {{ pfp_form.submit() }}
             </form>
         {% endif %}
-        <img src="{{ url_for('static', filename='images/pfp') }}/{{ query.pfp }}" alt="Profile picture" />
+        <img src="{{ url_for('static', filename='images/pfp') }}/{{ query.pfp }}" alt="{{ query.username }}'s profile picture." />
         <p>{{ query.username }}</p>
         <p>{{ query.permission.title() }}</p>
 
