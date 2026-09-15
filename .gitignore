@@ -4,3 +4,6 @@ __pycache__
 flask_session
 queries.sql
 .vscode
+css
+.DS_Store
+static/images/pfp
