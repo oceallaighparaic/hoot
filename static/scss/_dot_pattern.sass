@@ -1,0 +1,31 @@
+// set $n-dots-x and $n-dots-y and $dot-size, and $dot-color, $dot-background-color
+@use 'sass:color'
+
+@mixin dot_background($n-dots-x, $n-dots-y, $dot-size, $dot-color, $background-color, $border-radius: 0px, $direction: to left)
+    &::before // background color
+        content: ""
+        position: absolute
+        width: 100%
+        height: 100%
+        top: 0
+        left: 0
+        z-index: -2
+        background-color: $background-color
+        border-radius: $border-radius
+    &::after // dots
+        content: ""
+        position: absolute
+
+        $dot_gap_x: calc(100% / $n-dots-x) // width / N dots
+        $dot_gap_y: calc(100% / $n-dots-y) // height / N dots
+        width: 100%
+        height: 100%
+
+        left: 0
+        top: 0
+        z-index: -1
+
+        background-image: radial-gradient(circle at $dot-size $dot-size, color.change($dot-color, $alpha: 0.2) $dot-size, transparent 0)
+        background-size: $dot_gap_x $dot_gap_y
+        background-position: $dot_gap_x*0.5 $dot_gap_y*0.5
+        mask-image: linear-gradient($direction, black 50%, transparent 105%)

@@ -49,14 +49,14 @@ def P_home() -> str:
     if g.user_id and g.username:
         db = database.get_db()
         query = db.execute("""
-            SELECT users.id AS id, users.username AS username
+            SELECT users.id AS id, users.username AS username, users.pfp AS pfp
             FROM friends JOIN users 
             ON users.id = friends.user2
             WHERE friends.user1 = ?
                            
             UNION
                            
-            SELECT users.id AS id, users.username AS username
+            SELECT users.id AS id, users.username AS username, users.pfp AS pfp
             FROM friends JOIN users
             ON users.id = friends.user1
             WHERE friends.user2 = ?

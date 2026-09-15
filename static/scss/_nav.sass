@@ -1,39 +1,22 @@
 @use 'sass:color'
 @use 'base'
 @use 'nav_color' as nav
+@use 'dot_pattern'
     
 nav
     position: relative
 
-    $n_dots_x: 80
-    $n_dots_y: 4
-    $dot_size: 1px
-    &::before // background color
-        content: ""
-        position: absolute
-        width: 100%
-        height: 100%
-        top: 0
-        left: 0
-        z-index: -2
-        background-color: nav.$background-color
-    &::after // dots
-        content: ""
-        position: absolute
+    $n-dots-x: 80
+    $n-dots-y: 4
+    $dot-size: 1px
+    $dot-background-color: nav.$background-color
+    $dot-color: nav.$dot-color
 
-        $dot_gap_x: calc(100% / $n_dots_x) // width / N dots
-        $dot_gap_y: calc(100% / $n_dots_y) // height / N dots
-        width: 100%
-        height: 100%
-
-        left: 0
-        top: 0
-        z-index: -1
-
-        background-image: radial-gradient(circle at $dot_size $dot_size, color.change(nav.$dot_color, $alpha: 0.2) $dot_size, transparent 0)
-        background-size: $dot_gap_x $dot_gap_y
-        background-position: $dot_gap_x*0.5 $dot_gap_y*0.5
-        mask-image: linear-gradient(to left, black 50%, transparent 105%)
+    @include dot_pattern.dot_background(
+        $n-dots-x, $n-dots-y, $dot-size, 
+        $dot-color, 
+        $dot-background-color
+    )
 
     ul
         display: flex
