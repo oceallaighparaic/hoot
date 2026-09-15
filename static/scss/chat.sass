@@ -1,0 +1,99 @@
+@use 'base'
+@use 'sass:math'
+
+#chat
+    display: flex
+    flex-flow: column nowrap
+    justify-content: center
+    align-items: center
+    gap: 40px
+    margin-top: 80px
+
+    %chat-box
+        display: flex
+        flex-flow: column nowrap
+        justify-content: center
+        align-items: flex-start
+
+        $avatar-radius: 2em
+        img
+            @include base.avatar($radius: $avatar-radius)
+
+        border-radius: calc(0.2em + 3px) // inner radius + padding/2
+        padding: 0.4em
+
+        *
+            padding: 0
+            margin: 0
+
+        width: 30%
+
+        div
+            width: 100%
+
+        img
+            display: flex
+            flex-flow: row nowrap
+            align-items: center
+            margin: 0.2em
+
+        p, textarea
+            display: block
+            border: none
+
+            font-size: 1em
+            max-width: 100%
+
+            font-family: 'Rubik', 'Calibri', Helvetica, sans-serif
+
+            &:is(textarea)
+                color: base.$primary-dark
+                background-color: base.$primary-light
+                resize: none
+                overflow: hidden
+                width: 100%
+                
+                margin-top: 10px
+                border-radius: 3px
+
+                &:focus
+                    outline: none
+
+            &:is(p)
+                color: base.$primary-light
+                white-space: normal
+                overflow-wrap: break-word
+                word-break: break-word
+                margin: 0
+                padding: 0
+            
+    #receiver_box
+        @extend %chat-box
+        background-color: base.$accent-one
+        div
+            display: grid
+            grid-template-columns: 1fr auto
+            grid-template-areas: "message avatar"
+            img
+                grid-area: avatar
+                margin-left: 0.4em
+            p
+                grid-area: message
+
+    #sender_box
+        @extend %chat-box
+        background-color: base.$accent-two
+        div
+            display: grid
+            grid-template-columns: auto 1fr
+            grid-template-areas: "avatar message"
+            img
+                grid-area: avatar
+                margin-right: 0.4em
+            p
+                grid-area: message
+
+    &>*:first-child, &>*:nth-child(3)
+        transform: rotateZ(calc(var(--random-z-one) * 0.1deg)) translateX(calc(var(--random-x-one) * -0.1px))
+    &>*:nth-child(2)
+        transform: rotateZ(calc(var(--random-z-two) * -0.1deg)) translateX(calc(var(--random-x-two) * 0.1px))

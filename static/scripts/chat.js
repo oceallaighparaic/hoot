@@ -58,6 +58,7 @@ function send_message(e) {
 window.addEventListener("keypress", (e) => {
     if (e.key === "Enter") {
         send_message();
+        e.preventDefault();
         txt.value = "";
     }
 });

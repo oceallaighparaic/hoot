@@ -359,6 +359,8 @@ def P_chat(friend_id: int) -> str:
 
     g.return_args["messages"] = [dict(foo) for foo in db.execute( "SELECT sender_id, room, message FROM messages WHERE room = ?;" , (generate_room_id([g.user_id,friend_id]),) ).fetchall()]
     g.return_args["friend_id"] = friend_id
+    g.return_args["friend_pfp"] = db.execute("SELECT pfp FROM users WHERE id = ? ;", (friend_id,)).fetchone()["pfp"]
+    g.return_args["user_pfp"] = db.execute("SELECT pfp FROM users WHERE id = ? ;", (g.user_id,)).fetchone()["pfp"]
 
     return render_template("generic/chat.html", **g.return_args)
 

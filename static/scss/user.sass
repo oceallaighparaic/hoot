@@ -2,18 +2,7 @@
 @use 'sass:math'
 
 img:not(nav img), #profile-picture
-    $pfp-rad: 10vw
-    width: $pfp-rad
-    aspect-ratio: 1
-
-    padding: 0
-    margin: 0
-
-    background-color: base.$primary-light
-
-    mask: url('/static/images/pfp/circle.svg') center / contain no-repeat
-    --webkit-mask: url('/static/images/pfp/circle.svg') center / contain no-repeat
-    object-fit: cover
+    @include base.avatar
 
     &:is(label>img)
         &:hover
