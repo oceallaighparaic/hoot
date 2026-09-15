@@ -20,4 +20,4 @@ class LoginForm(FlaskForm):
 class EditUserForm(FlaskForm):
     image = FileField("Upload Image:", validators=[FileRequired(), FileAllowed(["jpg","jpeg","png"])])
     
-    submit = SubmitField("Edit PFP")
+    submit = SubmitField("Submit PFP")

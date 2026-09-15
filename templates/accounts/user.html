@@ -18,13 +18,18 @@
             <form action="" method="POST" enctype="multipart/form-data" novalidate>
                 {{ pfp_form.hidden_tag() }}
 
-                {{ create_field(pfp_form.image) }}
+                <label for="{{ pfp_form.image.id }}" style="cursor: pointer">
+                    <img src="{{ url_for('static', filename='images/pfp') }}/{{ query.pfp }}" alt="{{ query.username }}'s profile picture." />
+                </label>
+                {{ pfp_form.image(style="display: none;") }}
+
                 {{ pfp_form.submit() }}
             </form>
+        {% else %}
+            <img src="{{ url_for('static', filename='images/pfp') }}/{{ query.pfp }}" alt="{{ query.username }}'s profile picture." />
         {% endif %}
-        <img src="{{ url_for('static', filename='images/pfp') }}/{{ query.pfp }}" alt="{{ query.username }}'s profile picture." />
-        <p>{{ query.username }}</p>
-        <p>{{ query.permission.title() }}</p>
+        <h1>{{ query.username }}</h1>
+        <!-- <p>{{ query.permission.title() }}</p> -->
 
         {% if not b_user_edit_profile %}
         <ul>
