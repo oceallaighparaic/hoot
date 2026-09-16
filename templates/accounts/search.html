@@ -1,16 +1,17 @@
 {% extends "base.html" %}
 
 {% block header %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/search.css') }}" />
 {% endblock %}
 
 {% block main_content %}
     <main>
         {% for r in query %}
-        <article>
+        <section>
             {% for u in r %}
                 <a href="{{ url_for('P_user', username=u) }}">{{ u }}</a>
             {% endfor %}
-        </article>
+        </section>
         {% endfor %} 
     </main>
 {% endblock %}
