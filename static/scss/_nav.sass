@@ -1,9 +1,23 @@
 @use 'sass:color'
 @use 'base'
 @use 'nav_color' as nav
+@use 'dot_pattern'
     
 nav
-    background-color: grey
+    position: relative
+
+    $n-dots-x: 80
+    $n-dots-y: 4
+    $dot-size: 1px
+    $dot-background-color: nav.$background-color
+    $dot-color: nav.$dot-color
+
+    @include dot_pattern.dot_background(
+        $n-dots-x, $n-dots-y, $dot-size, 
+        $dot-color, 
+        $dot-background-color
+    )
+
     ul
         display: flex
         flex-flow: row nowrap
@@ -20,6 +34,10 @@ nav
             img
                 height: 35px
                 width: auto
+
+                transition: transform ease 0.2s
+                &:hover
+                    transform: scale(1.05) rotate(-1.5deg)
 
             &:has(.nav-search)
                 margin: 0 auto
@@ -61,6 +79,12 @@ nav
 
             background-color: base.$primary-light
 
+            transition: background-color ease 0.2s, transform ease 0.2s
+            &:hover
+                background-color: base.$primary-mid
+                transform: translateX(-5px) scale(1.05)
+                box-shadow: 0 0 12px 2px color.change(base.$primary-mid, $alpha: 0.4)
+
 %nav-btn-base
     display: block
     font-size: 1.2em
@@ -71,7 +95,37 @@ nav
     @extend %nav-btn-base
     padding: 5px 1vw 
     color: nav.$btn-color
+
+    position: relative
+    &::before // underline
+        content: ""
+        position: absolute
+        left: 10%
+        bottom: 0
+
+        width: 0
+        height: 2px
+        background-color: nav.$btn-color
+
+        transition: width ease 0.2s
+
+    transition: color ease 0.2s
+    &:hover
+        color: nav.$btn-hover-color
+
+        &::before
+            background-color: nav.$btn-hover-color
+            width: 80%
 .nav-cta
     @extend %nav-btn-base
-    padding: 5px 1vw
-    color: nav.$btn-color
+    color: base.$accent-one
+    border: base.$accent-one solid 2.5px
+    background-color: transparent
+    border-radius: 10px
+
+    transition: color ease 0.2s, border-color ease 0.2s, box-shadow ease 0.5s, transform ease 0.2s
+    &:hover
+        color: color.adjust(base.$accent-one, $lightness: -15%)
+        border-color: color.adjust(base.$accent-one, $lightness: -15%)
+        box-shadow: 0 0 12px 2px color.change(base.$accent-one, $alpha: 0.4)
+        transform: scale(1.02)

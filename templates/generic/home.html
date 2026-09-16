@@ -1,29 +1,34 @@
 {% extends "base.html" %}
 
 {% block header %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}" />
 {% endblock %}
 
 {% block main_content %}
-    <header>
-        <h1>Home.</h1>
-    </header>
-
     {% if g.user_id and g.username %}
     <section>
         {% if query %}
         <h1>Friends:</h1>
-        <ul>
+        <ul id="friends-list">
             {% for r in query %}
             <li>
                 <a href="{{ url_for('P_user', username=r.username) }}">
-                    <article>
-                        <h2>{{ r.username }}</h2>
-                        <p>{{ r.id }}</p>
-                    </article>
-                </a>
+                    <!-- <h2>{{ r.username }}</h2> -->
+                    <!-- <p>{{ r.id }}</p> -->
+                    <figure>
+                        <img src="{{ url_for('static', filename='images/pfp') }}/{{ r.pfp }}" class="avatar" aria-hidden="true" />
+                        <figcaption>
+                            {{ r.username }}
+                            <a href="{{ url_for('P_chat', friend_id=r.id) }}"><img src="{{ url_for('static', filename='images/chat_icon.svg') }}" alt="Open Chat" /></a>
+                        </figcaption>
+                    </figure>
+                </a> 
             </li>
             {% endfor %}
         </ul>
+        {% else %}
+        <h1>Looks like you have no friends!</h1>
+        <p>Use the searchbar to find people for a real-time chat.</p>
         {% endif %}
     </section>
     {% endif %}

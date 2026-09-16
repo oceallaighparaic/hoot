@@ -39,6 +39,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 }, false);
 
+function save_message() {
+    socket.emit("save_message", {
+        message: txt.value, sender_id:`${userId}`, ids:[userId, ...recipientIds]
+    });
+    console.log(`Saved: ${txt.value}`);
+}
+
 function send_message(e) {
     if (!txt.value.trim()) return;
 
@@ -48,16 +55,17 @@ function send_message(e) {
 
     if (save_timer) clearTimeout(save_timer);
     save_timer = setTimeout(() => {
-        socket.emit("save_message", {
-            message: txt.value, sender_id:`${userId}`, ids:[userId, ...recipientIds]
-        });
-        console.log(`Saved: ${txt.value}`);
+        if (txt.value.trim() !== "") {
+            save_message();
+        }
     }, 300);
 }
 
 window.addEventListener("keypress", (e) => {
     if (e.key === "Enter") {
         send_message();
+        e.preventDefault();
+        save_message();
         txt.value = "";
     }
 });

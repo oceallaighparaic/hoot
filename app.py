@@ -49,14 +49,14 @@ def P_home() -> str:
     if g.user_id and g.username:
         db = database.get_db()
         query = db.execute("""
-            SELECT users.id AS id, users.username AS username
+            SELECT users.id AS id, users.username AS username, users.pfp AS pfp
             FROM friends JOIN users 
             ON users.id = friends.user2
             WHERE friends.user1 = ?
                            
             UNION
                            
-            SELECT users.id AS id, users.username AS username
+            SELECT users.id AS id, users.username AS username, users.pfp AS pfp
             FROM friends JOIN users
             ON users.id = friends.user1
             WHERE friends.user2 = ?
@@ -359,6 +359,8 @@ def P_chat(friend_id: int) -> str:
 
     g.return_args["messages"] = [dict(foo) for foo in db.execute( "SELECT sender_id, room, message FROM messages WHERE room = ?;" , (generate_room_id([g.user_id,friend_id]),) ).fetchall()]
     g.return_args["friend_id"] = friend_id
+    g.return_args["friend_pfp"] = db.execute("SELECT pfp FROM users WHERE id = ? ;", (friend_id,)).fetchone()["pfp"]
+    g.return_args["user_pfp"] = db.execute("SELECT pfp FROM users WHERE id = ? ;", (g.user_id,)).fetchone()["pfp"]
 
     return render_template("generic/chat.html", **g.return_args)
 

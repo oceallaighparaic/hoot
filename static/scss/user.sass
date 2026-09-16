@@ -1,0 +1,9 @@
+@use 'base'
+@use 'sass:math'
+
+img:not(nav img), #profile-picture
+    @include base.avatar
+
+    &:is(label>img)
+        &:hover
+            cursor: pointer

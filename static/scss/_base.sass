@@ -23,3 +23,16 @@ html, body
     ::view-transition-group(page-content)
         animation-duration: 1s
         animation-timing-function: ease
+
+@mixin avatar($radius: 10vw)
+    width: $radius
+    aspect-ratio: 1
+
+    padding: 0
+    margin: 0
+
+    background-color: $primary-light
+
+    mask: url('/static/images/pfp/circle.svg') center / contain no-repeat
+    --webkit-mask: url('/static/images/pfp/circle.svg') center / contain no-repeat
+    object-fit: cover

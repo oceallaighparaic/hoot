@@ -1,26 +1,48 @@
 {% extends "base.html" %}
 
 {% block header %}
-<script src="{{ url_for('static', filename='scripts/socket.io.min.js') }}"></script> <!-- socketio client-side -->
-<script>
-    const userId = {{ g.user_id }};
+    <script src="{{ url_for('static', filename='scripts/socket.io.min.js') }}"></script> <!-- socketio client-side -->
+    <script>
+        const userId = {{ g.user_id }};
 
-    let messages = {{ messages | tojson }}; // jinja conversion from python to json 
+        let messages = {{ messages | tojson }}; // jinja conversion from python to json 
 
-    let recipientIds = [{{ friend_id }}];
-</script>
-<script src="{{ url_for('static', filename='scripts/chat.js') }}"></script>
+        let recipientIds = [{{ friend_id }}];
+    </script>
+    <script src="{{ url_for('static', filename='scripts/chat.js') }}"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            document.querySelector("#sender_box input").focus();
+        }, false);
+
+        function getRandomInt(min, max) {
+            const minCeiled = Math.ceil(min);
+            const maxFloored = Math.floor(max);
+            return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled); // The maximum is exclusive and the minimum is inclusive
+        }
+
+        document.documentElement.style.setProperty('--random-z-one', getRandomInt(-50,50));
+        document.documentElement.style.setProperty('--random-z-two', getRandomInt(-40,40));
+        document.documentElement.style.setProperty('--random-x-one', getRandomInt(-150,150));
+        document.documentElement.style.setProperty('--random-x-two', getRandomInt(-150,150));
+    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chat.css') }}" />
 {% endblock %}
 
 {% block main_content %}
     <section id="chat">
         <article id="receiver_box">
-            <p></p>
+            <div>
+                <p></p>
+                <img src="{{ url_for('static', filename='images/pfp')}}/{{ friend_pfp }}" alt="" />
+            </div>
         </article>
         <article id="sender_box">
-            <p></p>
+            <div>
+                <img src="{{ url_for('static', filename='images/pfp')}}/{{ user_pfp }}" alt="" />
+                <p></p>
+            </div>
+            <textarea type="text" id="chat-input" autofocus rows="2"></textarea>
         </article>
     </section>
-
-    <input type="text" placeholder="Enter a message..." id="chat-input" />
 {% endblock %}
