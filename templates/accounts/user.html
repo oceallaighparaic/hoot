@@ -49,13 +49,6 @@
             </li>
             {% endif %}
         </ul>
-        {% elif pfp_form %}
-            <form action="" method="POST" enctype="multipart/form-data" novalidate>
-                {{ pfp_form.hidden_tag() }}
-
-                {{ create_field(pfp_form.image) }}
-                {{ pfp_form.submit() }}
-            </form>
         {% endif %}
     {% endif %}
 {% endblock %}
