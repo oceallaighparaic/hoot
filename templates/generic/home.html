@@ -16,8 +16,11 @@
                     <!-- <h2>{{ r.username }}</h2> -->
                     <!-- <p>{{ r.id }}</p> -->
                     <figure>
-                        <img src="{{ url_for('static', filename='images/pfp') }}/{{ r.pfp }}" aria-hidden="true" />
-                        <figcaption>{{ r.username }}</figcaption>
+                        <img src="{{ url_for('static', filename='images/pfp') }}/{{ r.pfp }}" class="avatar" aria-hidden="true" />
+                        <figcaption>
+                            {{ r.username }}
+                            <a href="{{ url_for('P_chat', friend_id=r.id) }}"><img src="{{ url_for('static', filename='images/chat_icon.svg') }}" alt="Open Chat" /></a>
+                        </figcaption>
                     </figure>
                 </a> 
             </li>
