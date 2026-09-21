@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
 {% block header %}
-    <script src="{{ url_for('static', filename='scripts/socket.io.min.js') }}"></script> <!-- socketio client-side -->
     <script>
         const userId = {{ g.user_id }};
 

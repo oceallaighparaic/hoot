@@ -1,4 +1,3 @@
-let socket;
 let chat;
 let txt;
 
@@ -19,8 +18,6 @@ document.addEventListener("DOMContentLoaded", () => {
             receiver_chat.textContent = msg.message;
         }
     }
-
-    socket = io(); // connects to server
 
     socket.on("server_connection", (data) => {
         console.log(`${data.data}`);
@@ -50,8 +47,11 @@ function send_message(e) {
     if (!txt.value.trim()) return;
 
     socket.emit("send_key", { 
-        message: txt.value, sender_id:`${userId}`, ids:[userId, ...recipientIds] 
-    }); 
+        message: 
+            txt.value, 
+            sender_id:`${userId}`, 
+            ids:[userId, ...recipientIds]
+    });
 
     if (save_timer) clearTimeout(save_timer);
     save_timer = setTimeout(() => {

@@ -350,6 +350,19 @@ def remove_friend():
     return json.dumps("Removed as friend."),204 # success
 #endregion
 
+#region SOCKETIO
+@socketio.on("connect")
+def socket_connect():
+    print("User connected.")
+    emit("server_connection", {"data":f"Welcome."})
+    join_room(f"{session["user_id"]}")
+
+@socketio.on("disconnect")
+def socket_disconnect():
+    print("User disconnected.")
+    pass
+#endregion
+
 #region CHAT
 @app.route("/chat/<int:friend_id>", methods=["GET"], strict_slashes=False)
 @login_required
@@ -363,16 +376,6 @@ def P_chat(friend_id: int) -> str:
     g.return_args["user_pfp"] = db.execute("SELECT pfp FROM users WHERE id = ? ;", (g.user_id,)).fetchone()["pfp"]
 
     return render_template("generic/chat.html", **g.return_args)
-
-@socketio.on("connect")
-def socket_connect():
-    print("User connected.")
-    emit("server_connection", {"data":f"Welcome."})
-
-@socketio.on("disconnect")
-def socket_disconnect():
-    print("User disconnected.")
-    pass
 
 # !-- Room id is generated using the algorithm: sort ids low to high, join by '_'
 def generate_room_id(ids: list):
@@ -406,6 +409,16 @@ def socket_save_message(data):
     else: 
         db.execute("INSERT INTO messages(sender_id, room, message) VALUES (?,?,?)", (data["sender_id"], room_id, data["message"]))
     db.commit()
+
+    # holler
+    if len(list(socketio.server.manager.get_participants("/", room_id))) < len(data["ids"]): # if not open, send holler to everyone
+        for uid in data["ids"]:
+            if uid == session["user_id"]: continue
+            emit_obj = {
+                "from":session["user_id"]
+            }
+            socketio.emit("holler", emit_obj, to=f"{uid}")
+
 #endregion
 
 # !-- Run with python -m app instead of 'flask run'

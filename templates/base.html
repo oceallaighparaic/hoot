@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/generic.css') }}" />
+    <script src="{{ url_for('static', filename='scripts/socket.io.min.js') }}"></script> <!-- socketio client-side -->
+    {% if g.user_id and g.username %}
+        <script src="{{ url_for('static', filename='scripts/holler.js') }}"></script>
+    {% endif %}
     {% block header %}{% endblock %}
 
     <title>hoot!!!</title>
@@ -14,7 +18,7 @@
             <li><a href="{{ url_for('P_home') }}">
                 <img src="{{ url_for('static', filename='images/hoot_temp.png') }}" alt="hoot logo" />
             </a></li>
-            <li>            
+            <li>
                 <form action="{{ url_for('html_search') }}" method="GET" class="nav-search">
                     <input type="text" id="search" name="search" value="{{ search }}" placeholder="search a username..." />
                     <input type="image" src="{% block search_image %}{{ url_for('static', filename='images/search_light.svg') }}{% endblock %}" alt="Search for a username." />
