@@ -1,0 +1,75 @@
+@use 'base'
+@use 'sass:color'
+
+@property --a
+    syntax: "<angle>"
+    initial-value: 0deg
+    inherits: false
+
+@keyframes spin 
+    to 
+        --a: 360deg
+
+@keyframes new_notif
+    from
+        transform: translateY(-50%)
+        opacity: 0
+    50%
+        opacity: 1
+    to
+        transform: translateY(0)
+
+
+main
+    position: relative
+    #notification_hub
+        position: absolute
+        top: 0
+        right: 0
+        z-index: 100
+
+        display: flex
+        flex-flow: column nowrap
+        align-items: flex-start
+        justify-content: flex-start
+        gap: 1em
+
+        margin-right: 1em
+
+        a
+            text-decoration: none
+        .notification
+            display: flex
+            flex-flow: row nowrap
+            align-items: center
+            justify-content: flex-start
+            gap: 1em
+
+            background-color: base.$primary-light
+            border-radius: 10px
+            padding: 0.5em
+
+            width: 30vw
+
+            color: base.$primary-dark
+
+            h1
+                display: block
+                font-size: 1em
+                margin-left: 1em
+
+                background: -webkit-linear-gradient(0deg, base.$accent-two, color.adjust($color: base.$accent-two, $lightness: -12.5%))
+                -webkit-background-clip: text
+                -webkit-text-fill-color: transparent
+
+            position: relative
+            &::before // spinning border!!
+                content: ""
+                position: absolute
+                inset: -2px
+                z-index: -10
+
+                border-radius: 12px
+
+                background-image: conic-gradient(from var(--a), base.$secondary 45deg, base.$accent-one 90deg, rgba(0,0,0,0) 210deg)
+                animation: spin 3s linear infinite

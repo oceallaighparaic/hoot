@@ -1,6 +1,6 @@
 let socket;
 let active_hollers = new Map();
-const len = 2000
+const len = 100000
 
 document.addEventListener("DOMContentLoaded", () => {
     console.log("studies have shown that Hi");
@@ -32,6 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
         let tmp = document.querySelector("#notification_hub template");
         let notif = tmp.content.firstElementChild.cloneNode(true);
         notif.querySelector("p").textContent = `from ${data.from}`;
+        notif.href = chat_url + `${data.from_id}`
         document.getElementById("notification_hub").appendChild(notif);
         
         active_hollers.set(data.from, {notif, timeout: start_timer(data.from, notif)});

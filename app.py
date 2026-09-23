@@ -416,7 +416,8 @@ def socket_save_message(data):
         for uid in data["ids"]:
             if uid == session["user_id"]: continue
             emit_obj = {
-                "from":username
+                "from":username,
+                "from_id":data["sender_id"]
             }
             socketio.emit("holler", emit_obj, to=f"{uid}")
 
