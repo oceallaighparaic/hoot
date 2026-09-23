@@ -1,6 +1,6 @@
 let socket;
 let active_hollers = new Map();
-const len = 100000
+const len = 5000
 
 document.addEventListener("DOMContentLoaded", () => {
     console.log("studies have shown that Hi");
@@ -16,6 +16,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     socket.on("holler", (data) => {
+        if(typeof friend_id !== "undefined") {
+            if(friend_id == data.from_id) return;
+        }
+
         function start_timer(from, notif) {
             return setTimeout(() => {notif.remove(); active_hollers.delete(from)}, len);
         }
