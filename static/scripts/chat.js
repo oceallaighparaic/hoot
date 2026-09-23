@@ -58,7 +58,7 @@ function send_message(e) {
         if (txt.value.trim() !== "") {
             save_message();
         }
-    }, 300);
+    }, 600);
 }
 
 window.addEventListener("keypress", (e) => {

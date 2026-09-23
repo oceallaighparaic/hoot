@@ -411,11 +411,12 @@ def socket_save_message(data):
     db.commit()
 
     # holler
+    username = None if not session["user_id"] else database.get_db().execute("SELECT username FROM users WHERE id = ? ;", (session["user_id"],)).fetchone()["username"]
     if len(list(socketio.server.manager.get_participants("/", room_id))) < len(data["ids"]): # if not open, send holler to everyone
         for uid in data["ids"]:
             if uid == session["user_id"]: continue
             emit_obj = {
-                "from":session["user_id"]
+                "from":username
             }
             socketio.emit("holler", emit_obj, to=f"{uid}")
 
